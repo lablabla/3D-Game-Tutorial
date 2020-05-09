@@ -3,7 +3,6 @@
 
 #include "Window.h"
 
-Window* window = nullptr;
 
 Window::Window() :
 	m_hwnd(),
@@ -18,13 +17,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	{
 	case WM_CREATE: // Event fired when window is created
 	{
+		auto window = (Window*)((LPCREATESTRUCT)lparam)->lpCreateParams;
+		int res = SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
+		window->setHWND(hwnd);
 		window->onCreate();
 		break;
 	}
 	
 	case WM_DESTROY: // Event fired when window is destroyed
 	{
-		window->onDestroy();
+		auto window = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 		::PostQuitMessage(0);
 		break;
 	}
@@ -58,13 +60,9 @@ bool Window::init()
 		return false;
 	}
 
-	if (!window)
-	{
-		window = this;
-	}
 
 	m_hwnd = ::CreateWindowEx(WS_EX_OVERLAPPEDWINDOW, wc.lpszClassName, L"DirectX Application", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1024, 768,
-		NULL, NULL, NULL, NULL);
+		NULL, NULL, NULL, this);
 
 	if (!m_hwnd)
 	{
@@ -89,6 +87,7 @@ bool Window::broadcast()
 		DispatchMessageA(&msg);
 	}
 
+	auto window = reinterpret_cast<Window*>(GetWindowLongPtr(m_hwnd, GWLP_USERDATA));
 	window->onUpdated();
 
 	Sleep(0);
@@ -107,6 +106,18 @@ bool Window::release()
 		return false;
 	}
 	return true;
+}
+
+RECT Window::getClientWindowRect()
+{
+	RECT rc;
+	::GetClientRect(m_hwnd, &rc);
+	return rc;
+}
+
+void Window::setHWND(HWND hwnd)
+{
+	m_hwnd = hwnd;
 }
 
 void Window::onDestroy()

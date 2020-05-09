@@ -19,6 +19,9 @@ public:
 	// Releases the window
 	bool release();
 
+	RECT getClientWindowRect();
+	void setHWND(HWND hwnd);
+
 	virtual void onCreate() = 0;
 	virtual void onUpdated() = 0;
 	virtual void onDestroy();
