@@ -3,6 +3,7 @@
 #include <d3d11.h>
 
 class SwapChain;
+class DeviceContext;
 
 class GraphicsEngine
 {
@@ -17,7 +18,7 @@ public:
 
 public:
 	SwapChain* createSwapChain();
-
+	DeviceContext* getImmediateDeviceContext();
 	static GraphicsEngine* get();
 
 private:
@@ -30,6 +31,8 @@ private:
 	IDXGIDevice* m_dxgiDevice;
 	IDXGIAdapter* m_dxgiAdapter;
 	IDXGIFactory* m_dxgiFactory;
+
+	DeviceContext* m_immDeviceContext;
 
 private:
 	friend class SwapChain;

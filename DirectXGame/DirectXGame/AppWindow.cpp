@@ -5,6 +5,7 @@
 
 #include "SwapChain.h"
 
+#include "DeviceContext.h"
 
 AppWindow::AppWindow()
 {
@@ -28,6 +29,11 @@ void AppWindow::onCreate()
 
 void AppWindow::onUpdated()
 {
+	auto ge = GraphicsEngine::get();
+	auto immContext = ge->getImmediateDeviceContext();
+	immContext->clearRenderTargetColor(m_swapChain, 1, 0, 0, 1);
+
+	m_swapChain->present(false);
 }
 
 void AppWindow::onDestroy()

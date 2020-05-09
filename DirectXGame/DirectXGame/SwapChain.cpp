@@ -3,7 +3,8 @@
 #include "GraphicsEngine.h"
 
 SwapChain::SwapChain() :
-	m_swapChain(nullptr)
+	m_swapChain(nullptr),
+	m_rtd(nullptr)
 {
 }
 
@@ -35,6 +36,26 @@ bool SwapChain::init(HWND hwnd, UINT width, UINT height)
 	{
 		return false;
 	}
+
+	ID3D11Texture2D* buffer = nullptr;
+	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer));
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	result = device->CreateRenderTargetView(buffer, NULL, &m_rtd);
+	buffer->Release();
+	if (FAILED(result))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool SwapChain::present(bool vsync)
+{
+	m_swapChain->Present(vsync, NULL);
 	return true;
 }
 

@@ -18,7 +18,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	case WM_CREATE: // Event fired when window is created
 	{
 		auto window = (Window*)((LPCREATESTRUCT)lparam)->lpCreateParams;
-		int res = SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)window);
 		window->setHWND(hwnd);
 		window->onCreate();
 		break;
@@ -81,16 +81,16 @@ bool Window::init()
 bool Window::broadcast()
 {
 	MSG msg;
+	onUpdated();
+
 	while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
 	{
 		TranslateMessage(&msg);
 		DispatchMessageA(&msg);
 	}
 
-	auto window = reinterpret_cast<Window*>(GetWindowLongPtr(m_hwnd, GWLP_USERDATA));
-	window->onUpdated();
 
-	Sleep(0);
+	Sleep(1);
 	return true;
 }
 
